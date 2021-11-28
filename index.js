@@ -5,14 +5,17 @@ const typeDefs = gql`
   type Query {
     book: [Book!]
     author: [Author!]
+    getBook(ID: String): Book
+    getAuthor(ID: String): Author
   }
   type Book {
     name: String!
-    author: Int!
+    author: String!
   }
   type Author {
     name: String!
     age: Int!
+    book: [Book]
   }
 `;
 const resolvers = {
@@ -23,7 +26,19 @@ const resolvers = {
     author: () => {
       return author;
     },
+    getBook: (parent, args, context) => {
+      console.log(parent);
+      return books.find((book) => book.id === args.ID);
+    },
+    getAuthor: (parent, args, context) => {
+      return author.find(a=>a.id===args.ID)
+    },
   },
+  Author:{
+    book:(parent,args,context)=>{
+      return books.filter(book=>book.author === parent.id)
+    }
+  }
 };
 
 const server = new ApolloServer({ typeDefs, resolvers });
